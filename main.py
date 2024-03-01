@@ -2,10 +2,11 @@ import sys
 from Adafruit_IO import MQTTClient
 import time
 import random
+from simple_ai import *
 
 AIO_FEED_ID = ["button1", "button2"]
 AIO_USERNAME = "minhnguyen2810"
-AIO_KEY = ""
+AIO_KEY = "aio_sLVl12E9SRap1USKgiRQC7m8NNc2"
 
 def connected(client):
     print("Ket noi thanh cong ...")
@@ -31,9 +32,13 @@ client.connect()
 client.loop_background()
 
 counter = 10
+ai_counter = 5
 sensor_type = 0
+prev_ai_result = ""
+ai_result = ""
 while True:
     counter = counter-1
+    ai_counter-=1
     if counter<=0:
         counter = 10
         if(sensor_type==0):
@@ -51,5 +56,14 @@ while True:
             light = random.randint(10, 50)
             client.publish("demo2", light)
             sensor_type = 0
+    
+    if ai_counter<=0:
+        ai_counter = 5
+        ai_result = image_detector()
+        print("AI_result: ", ai_result)
+        if(ai_result!=prev_ai_result):
+            prev_ai_result = ai_result
+            client.publish("ai",ai_result)
     time.sleep(1)
     pass
+   
